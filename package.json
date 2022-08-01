@@ -1,0 +1,34 @@
+{
+  "name": "crafting-game",
+  "version": "1.0.0",
+  "description": "A full-stack tactical game app",
+  "main": "index.js",
+  "scripts": {
+    "server-dev": "npx nodemon server/index.js",
+    "react-dev": "webpack --mode development --watch",
+    "build": "webpack --config webpack.config.js"
+  },
+  "dependencies": {
+    "axios": "^0.24.0",
+    "enzyme": "^3.11.0",
+    "eslint": "^8.1.0",
+    "express": "^4.17.1",
+    "jquery": "^3.6.0",
+    "morgan": "^1.10.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "styled-components": "^5.3.3",
+    "underscore": "^1.13.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.15.8",
+    "@babel/preset-env": "^7.15.8",
+    "@babel/preset-react": "^7.14.5",
+    "@wojtekmaj/enzyme-adapter-react-17": "^0.6.5",
+    "babel-loader": "^8.2.3",
+    "enzyme": "^3.11.0",
+    "eslint-config-next": "12.0.7",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
+  }
+}
