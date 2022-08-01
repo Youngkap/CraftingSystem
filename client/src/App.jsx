@@ -1,10 +1,7 @@
-import 'regenerator-runtime/runtime';
 import styled from 'styled-components';
 import axios from 'axios';
 import React from 'react';
 
-import axiosClient from '../src/apiClient.js';
-import { data } from 'jquery';
 
 class App extends React.Component {
   constructor(props) {
@@ -16,9 +13,6 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    
-    
-    
   }
 
 
@@ -26,7 +20,7 @@ class App extends React.Component {
 
   render () {
     return (<OverDiv>
-      
+      Hi
     </OverDiv>)
   }
 }

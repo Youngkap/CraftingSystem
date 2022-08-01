@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "server-dev": "npx nodemon server/index.js",
-    "react-dev": "webpack --mode development --watch",
-    "build": "webpack --config webpack.config.js"
+    "react-dev": "webpack --mode development --watch"
   },
   "dependencies": {
     "axios": "^0.24.0",
