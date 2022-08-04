@@ -1,11 +1,12 @@
 import styled from 'styled-components';
 import React from 'react';
-import axios from 'axios';
+
 import Completion from './components/completion.jsx';
 import Durability from './components/durability.jsx';
 import Materials from './components/materials.jsx';
 import Techniques from './components/techniques.jsx';
 import Hand from './components/hand.jsx';
+
 
 class App extends React.Component {
   constructor(props) {
@@ -15,19 +16,28 @@ class App extends React.Component {
         currentHP: 10, 
         maxHP:10
       }, 
-      technique1: undefined, 
-      technique2: undefined, 
-      technique3: undefined,
+      technique1: null, 
+      technique2: null, 
+      technique3: null,
       completion: {
         currentHP: 10, 
         maxHP:10
       }, 
       material1: {
-        currentHP: 10,
-        maxHP: 10
+        name: "Iron",
+        currentHP: 5,
+        maxHP: 5,
+        effect: () => {
+          let ranDamage = Math.floor(Math.random() * 3) + 1;
+          this.handleRandomTarget("player", (chosenTarget) => {
+            this.handleDamage(chosenTarget, ranDamage);
+          })
+        },
+        description: "Deals 1-3 damage to either the durability or a random technique.",
+        priority: false
       },
-      material2: undefined,
-      material3: undefined,
+      material2: null,
+      material3: null,
       tech_deck: [
         {
           name: "Temper",
@@ -54,28 +64,42 @@ class App extends React.Component {
         },
         {
           name: "Cool",
-          effect: () => {},
+          effect: () => {
+            this.createResidual("Cooling", 5, () => {}, "This technique must be targeted.", true)
+          },
           description: "Create a residual technique that will be targeted before the base material. This has 5 HP."
         },
         {
           name: "Shape",
-          effect: () => {},
+          effect: () => {
+            this.createResidual("Shaping", 2, () => {
+              this.handleRandomTarget("enemy", (chosenTarget) => {
+                this.handleDamage(chosenTarget, 3);
+              })
+            }, "Deal 3 damage to a random material at the start of your turn.")
+          },
           description: "Create a residual technique that will deal 3 damage to a random material at the start of your turn. This has 2 HP."
         },
         {
-          name: "Heat",
-          effect: () => {},
-          description: "Double the next instance of damage you deal."
+          name: "End Turn",
+          effect: () => {
+            this.handleEndTurn();
+          },
+          description: "End your turn."
         }
       ],
       targeting: false,
-      activatingEffect: null
+      activatingEffect: null,
+      priority_player: [],
+      priority_enemy: []
     }
  
     this.handleDamage = this.handleDamage.bind(this);
     this.handleRandomTarget = this.handleRandomTarget.bind(this);
     this.handleSelectingEffect = this.handleSelectingEffect.bind(this);
     this.handleSelectingTarget = this.handleSelectingTarget.bind(this);
+    this.createResidual = this.createResidual.bind(this);
+    this.handleEndTurn = this.handleEndTurn.bind(this);
   }
 
   componentDidMount() {
@@ -85,29 +109,36 @@ class App extends React.Component {
 
 
   handleDamage(target, amount) {
-    if (this.state[target] != undefined) {
+    if (this.state[target] != null) {
       let newHP = this.state[target];
       newHP.currentHP-= amount;
-      this.setState({[target]: newHP});
+      if (newHP.currentHP <= 0) {
+        this.setState({[target]: null});
+      } else {
+        this.setState({[target]: newHP});
+      }
     }
-    console.log(target)
-    console.log(this.state[target])
   }
 
   handleRandomTarget(targetSide, effect) {
     let targetArray = [];
-    if (targetSide = "enemy") {
+    if (targetSide == "enemy") {
       targetArray.push("completion");
       for (let i = 1; i < 4; i++) {
-        if (this.state[`material${i}`] != undefined) {
+        if (this.state[`material${i}`] != null) {
           targetArray.push(`material${i}`);
         }
       }
       
-    } else if (targetSide = "player") {
+    } else if (targetSide == "player") {
+      console.log("player being targeted")
       targetArray.push("durability");
       for (let i = 1; i < 4; i++) {
-        if (this.state[`technique${i}`] != undefined) {
+        if (this.state[`technique${i}`] != null) {
+          if (this.state[`technique${i}`].priority == true) {
+            targetArray = [`technique${i}`];
+            break;
+          }
           targetArray.push(`technique${i}`);
         }
       }
@@ -151,12 +182,45 @@ class App extends React.Component {
     this.setState({targeting: false, activatingEffect: null})
   }  
   
+  createResidual (name, health, effect, description, priority) {
+    let isPriority = priority || false;
+    for (let r = 1; r < 4; r++) {
+      if (this.state[`technique${r}`] == null) {
+        this.setState({[`technique${r}`]: {
+          name: name,
+          currentHP: health,
+          maxHP: health,
+          effect: effect,
+          description: description,
+          priority: isPriority
+        }})
+        break;
+      }
+    }
+  }
+
+  handleEndTurn () {
+    //Passive Effects of Residual Techniques
+    for (let p = 1; p < 4; p++) {
+      if (this.state[`technique${p}`] != null) {
+        this.state[`technique${p}`].effect();
+      }
+    }
+    
+    //Enemy Turn
+    for (let m = 1; m < 4; m++) {
+      if (this.state[`material${m}`] != null) {
+        this.state[`material${m}`].effect();
+      }
+    }
+
+  }
 
   render () {
     return (<OverDiv>
       <FieldDiv>
         <Durability hp={this.state.durability} handleSelect={this.handleSelectingTarget} />
-        <Techniques techlist={[this.state.technique1, this.state.technique2, this.state.technique3]} handleSelect={this.handleSelectingTarget} />
+        <Techniques techList={[this.state.technique1, this.state.technique2, this.state.technique3]} handleSelect={this.handleSelectingTarget} />
         <GapDiv/>
         <Materials matList={[this.state.material1, this.state.material2, this.state.material3]} handleSelect={this.handleSelectingTarget} />
         <Completion hp={this.state.completion} handleSelect={this.handleSelectingTarget} />
