@@ -43,7 +43,13 @@ class App extends React.Component {
         },
         {
           name: "Strike",
-          effect: () => {},
+          effect: () => {
+            console.log("here");
+            this.handleSelectingEffect((chosenTarget) => {
+              let ranDamage = Math.floor(Math.random() * 4) + 1;
+              this.handleDamage(chosenTarget, ranDamage);
+            })
+          },
           description: "Deal 1-5 damage to a target material."
         },
         {
@@ -61,11 +67,15 @@ class App extends React.Component {
           effect: () => {},
           description: "Double the next instance of damage you deal."
         }
-      ]
+      ],
+      targeting: false,
+      activatingEffect: null
     }
  
     this.handleDamage = this.handleDamage.bind(this);
     this.handleRandomTarget = this.handleRandomTarget.bind(this);
+    this.handleSelectingEffect = this.handleSelectingEffect.bind(this);
+    this.handleSelectingTarget = this.handleSelectingTarget.bind(this);
   }
 
   componentDidMount() {
@@ -109,20 +119,47 @@ class App extends React.Component {
     effect(targetArray[randomChoice])
   }
 
-
-  handleChosenTarget(target, effect) {
-
+  handleSelectingEffect (effect) {
+    if (this.state.targeting == false) {
+      this.setState({targeting: true, activatingEffect: effect});
+      console.log("Effect selected");
+    } else {
+      this.setState({targeting: false, activatingEffect: null});
+    }
+    
   }
+
+  handleSelectingTarget (side, ind) {
+    console.log(side, ind);
+
+    if (this.state.targeting) {
+      if (ind == 0) {
+        if (side == "player") {
+          this.state.activatingEffect("durability");
+        } else if (side == "enemy") {
+          this.state.activatingEffect("completion")
+        }
+      } else {
+        if (side == "player") {
+          this.state.activatingEffect(`technique${ind}`);
+        } else if (side == "enemy") {
+          this.state.activatingEffect(`material${ind}`);
+        }
+      }
+      
+    }
+    this.setState({targeting: false, activatingEffect: null})
+  }  
   
 
   render () {
     return (<OverDiv>
       <FieldDiv>
-        <Durability hp={this.state.durability} />
-        <Techniques />
+        <Durability hp={this.state.durability} handleSelect={this.handleSelectingTarget} />
+        <Techniques techlist={[this.state.technique1, this.state.technique2, this.state.technique3]} handleSelect={this.handleSelectingTarget} />
         <GapDiv/>
-        <Materials matList={[this.state.material1, this.state.material2, this.state.material3]} />
-        <Completion hp={this.state.completion} />
+        <Materials matList={[this.state.material1, this.state.material2, this.state.material3]} handleSelect={this.handleSelectingTarget} />
+        <Completion hp={this.state.completion} handleSelect={this.handleSelectingTarget} />
       </FieldDiv>
       <Hand deck={this.state.tech_deck} />
     </OverDiv>)

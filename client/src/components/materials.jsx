@@ -15,7 +15,7 @@ const Materials = (props) => {
       {props.matList.map((mat, i) => {
         if (mat != undefined) {
           return (
-            <SlotDiv index={i}>
+            <SlotDiv value={"enemy"} index={i+1} onClick={(e) => {props.handleSelect("enemy", i+1)}} >
               {mat.currentHP} / {mat.maxHP}
             </SlotDiv>
           )

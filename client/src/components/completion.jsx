@@ -13,7 +13,9 @@ const Completion = (props) => {
   return (
     <ComDiv>
       <GapDiv />
-      <GapDiv>{props.hp.currentHP} / {props.hp.maxHP}</GapDiv>
+      <GapDiv value={"enemy"} index={0} onClick={(e) => {props.handleSelect("enemy", 0)}} >
+        {props.hp.currentHP} / {props.hp.maxHP}
+        </GapDiv>
       <GapDiv />
     </ComDiv>
   )

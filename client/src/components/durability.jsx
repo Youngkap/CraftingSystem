@@ -13,7 +13,9 @@ const Durability = (props) => {
   return (
     <DurDiv>
       <GapDiv />
-      <GapDiv>{props.hp.currentHP} / {props.hp.maxHP}</GapDiv>
+      <GapDiv value={"player"} index={0} onClick={(e) => {props.handleSelect("enemy", 0)}}>
+        {props.hp.currentHP} / {props.hp.maxHP}
+        </GapDiv>
       <GapDiv />
     </DurDiv>
   )
